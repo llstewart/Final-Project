@@ -1,3 +1,7 @@
+c = "Hi"
+print(c)
+
+
 s = "hello"
 print (s)
 
