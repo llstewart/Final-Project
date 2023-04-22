@@ -1,11 +1,23 @@
 # Import required libraries
 # Make sure to run `pip install pandas`, `pip install nba-api`, and `pip install matplotlib` in the terminal
 # before running this code
+"""
+This script allows users to compare the season averages of two NBA players for a given season.
+It retrieves the data from the nba_api library, which is available after running:
+    pip install pandas
+    pip install nba-api
+    pip install matplotlib
+"""
+
 import requests
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats
 
 class NBAPlayerData:
+    """
+    A class to retrieve and process NBA player data.
+    """
+
     def __init__(self):
         pass
 
@@ -18,6 +30,10 @@ class NBAPlayerData:
             return None
 
     # Get the season averages for the player using player ID and season year
+    """
+        Get the season averages for the player using player ID and season year.
+        
+     """
     def get_season_averages(self, player_id, season):
         career_stats = playercareerstats.PlayerCareerStats(player_id=player_id)
         career_data = career_stats.get_data_frames()[0]
@@ -33,7 +49,17 @@ class NBAPlayerData:
     def data_cleaning(self):
         pass
 
-    # Get the player data using player name and season year
+    """
+        Get the player data using player name and season year.
+        
+        Parameters:
+        player_name (str): Full name of the player.
+        season (int): Season year.
+        
+        Returns:
+        pd.Series: Season averages if available, None otherwise.
+    """
+
     def get_player_data(self, player_name, season):
         player_id = self.get_player_id(player_name)
         if player_id:
@@ -41,8 +67,17 @@ class NBAPlayerData:
         else:
             return None
 
+
 # Function to get user input for player names and season year
+    """
+    Function to get user input for player names and season year.
+    
+    Returns:
+    tuple: Player1's name, Player2's name, and the season year.
+    """
+
 def player_selection():
+    
     player1_name = input("Enter the first player's name: ")
     player1_name = ' '.join([name.capitalize() for name in player1_name.lower().split()])
     player2_name = input("Enter the second player's name: ")
