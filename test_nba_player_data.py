@@ -1,5 +1,5 @@
 import unittest
-from Final_Project import NBAPlayerData  # Assuming the original code is saved in a file named nba_player_data.py
+from Final_Project import NBAPlayerData  # Assuming the original code is saved in a file named Final_Project.py
 
 class TestNBAPlayerData(unittest.TestCase):
 
@@ -7,7 +7,7 @@ class TestNBAPlayerData(unittest.TestCase):
         self.player_data = NBAPlayerData()
 
     def test_get_player_id(self):
-        player_id = self.player_data.get_player_id("LeBron James")
+        player_id = self.player_data.get_player_id("Lebron James")
         self.assertIsNotNone(player_id)
         self.assertEqual(player_id, 2544)
 
@@ -24,14 +24,14 @@ class TestNBAPlayerData(unittest.TestCase):
         self.assertIsNone(season_averages)
 
     def test_get_player_data(self):
-        player_data = self.player_data.get_player_data("LeBron James", 2020)
+        player_data = self.player_data.get_player_data("Lebron James", 2020)
         self.assertIsNotNone(player_data)
         self.assertEqual(player_data["PLAYER_AGE"], 35)
 
         player_data = self.player_data.get_player_data("Nonexistent Player", 2020)
         self.assertIsNone(player_data)
 
-        player_data = self.player_data.get_player_data("LeBron James", 1999)
+        player_data = self.player_data.get_player_data("Lebron James", 1999)
         self.assertIsNone(player_data)
 
 if __name__ == "__main__":
