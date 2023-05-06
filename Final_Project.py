@@ -80,18 +80,10 @@ def player_selection():
     
     player1_name = input("Enter the first player's name: ")
     player1_name = ' '.join([name.capitalize() for name in player1_name.lower().split()])
-
-
-def compare_averages(player1_data, player2_data):
-    print("\nComparison of season averages:")
-    for key in player1_data.keys():
-        if key not in ['PLAYER_ID', 'SEASON_ID']:
-            if player1_data[key] > player2_data[key]:
-                print(f"{key}: {player1_name} ({player1_data[key]}) > {player2_name} ({player2_data[key]})")
-            elif player1_data[key] < player2_data[key]:
-                print(f"{key}: {player1_name} ({player1_data[key]}) < {player2_name} ({player2_data[key]})")
-            else:
-                print(f"{key}: {player1_name} ({player1_data[key]}) = {player2_name} ({player2_data[key]})")
+    player2_name = input("Enter the second player's name: ")
+    player2_name = ' '.join([name.capitalize() for name in player2_name.lower().split()])
+    season = int(input("Enter the season (year): "))
+    return player1_name, player2_name, season
 
 
 # Main function to run the script
