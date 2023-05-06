@@ -93,13 +93,16 @@ def player_selection():
     season = int(input("Enter the season (year): "))
     return player1_name, player2_name, season
 
+"""
+Below is a function that asks users if they want to compare more players once their first comparison is finished.
+"""
 def compare_more_players():
     while True:
         user_input = input("Do you want to compare more players? (yes/no): ").lower()
         if user_input == 'yes':
-            return True
+            return True #restart the comparison
         elif user_input == 'no':
-            return False
+            return False #stop
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")
 
@@ -108,19 +111,24 @@ def compare_more_players():
 if __name__ == "__main__":
     player_data = NBAPlayerData()
     welcome = welcome_user()
-    player1_name, player2_name, season = player_selection()
-    player1_data = player_data.get_player_data(player1_name, season)
-    player2_data = player_data.get_player_data(player2_name, season)
 
-    # Print the season averages for both players if data is available
-    if player1_data is not None and player2_data is not None:
-        print(f"\n{player1_name}'s season averages for {season}:")
-        for key, value in player1_data.items():
-            print(f"{key}: {value}")
+    while True: #while compare more player functions is true, rerun the program
+        player1_name, player2_name, season = player_selection()
+        player1_data = player_data.get_player_data(player1_name, season)
+        player2_data = player_data.get_player_data(player2_name, season)
 
-        print(f"\n{player2_name}'s season averages for {season}:")
-        for key, value in player2_data.items():
-            print(f"{key}: {value}")
-    else:
-        print("One or both players do not have data for the specified season. Please try again.")
+        if player1_data is not None and player2_data is not None:
+            print(f"\n{player1_name}'s season averages for {season}:")
+            for key, value in player1_data.items():
+                print(f"{key}: {value}")
 
+            print(f"\n{player2_name}'s season averages for {season}:")
+            for key, value in player2_data.items():
+                print(f"{key}: {value}")
+
+            if not compare_more_players():
+                break
+        else:
+            print("One or both players do not have data for the specified season. Please try again.")
+    
+    
