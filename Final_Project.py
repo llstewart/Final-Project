@@ -69,7 +69,7 @@ class NBAPlayerData:
 
 #Function that prints user's name and welcome messgae with short program explanation
 
-def weclome_user():
+def welcome_user():
     user_name = input("Enter your Name: ")
     print(user_name + ", welcome to the NBA Seasonal Average Comparison Program. Please input the names of two players you wish to compare.")
 
@@ -90,11 +90,21 @@ def player_selection():
     season = int(input("Enter the season (year): "))
     return player1_name, player2_name, season
 
+def compare_more_players():
+    while True:
+        user_input = input("Do you want to compare more players? (yes/no): ").lower()
+        if user_input == 'yes':
+            return True
+        elif user_input == 'no':
+            return False
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+
 
 # Main function to run the script
 if __name__ == "__main__":
     player_data = NBAPlayerData()
-    welcome = weclome_user()
+    welcome = welcome_user()
     player1_name, player2_name, season = player_selection()
     player1_data = player_data.get_player_data(player1_name, season)
     player2_data = player_data.get_player_data(player2_name, season)
