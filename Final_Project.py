@@ -74,7 +74,7 @@ def weclome_user():
     if user_name:
         print(user_name + ", welcome to the NBA Seasonal Average Comparison Program. Please input the names of two players you wish to compare.")
     else:
-        print("Error. Please gave players name"
+        print("Error. Please gave player's name"
 
 # Function to get user input for player names and season year
     """
