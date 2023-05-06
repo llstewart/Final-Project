@@ -67,6 +67,11 @@ class NBAPlayerData:
         else:
             return None
 
+#Function that prints user's name and welcome messgae with short program explanation
+
+def weclome_user():
+    user_name = input("Enter your Name: ")
+    print(user_name + ", welcome to the NBA Seasonal Average Comparison Program. Please input the names of two players you wish to compare.")
 
 # Function to get user input for player names and season year
     """
@@ -89,6 +94,7 @@ def player_selection():
 # Main function to run the script
 if __name__ == "__main__":
     player_data = NBAPlayerData()
+    welcome = weclome_user()
     player1_name, player2_name, season = player_selection()
     player1_data = player_data.get_player_data(player1_name, season)
     player2_data = player_data.get_player_data(player2_name, season)
