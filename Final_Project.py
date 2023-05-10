@@ -70,11 +70,13 @@ class NBAPlayerData:
 #Function that prints user's name and welcome messgae with short program explanation
 
 def welcome_user():
-    user_name = input("Enter your Name: ")
-    if user_name:
-        print(user_name + ", welcome to the NBA Seasonal Average Comparison Program. Please input the names of two players you wish to compare.")
-    else:
-        print("Error. Please gave player's name")
+    while True:
+        user_name = input("Enter your Name: ").strip()
+        if user_name:
+            print(user_name + ", welcome to the NBA Seasonal Average Comparison Program. Please input the names of two players you wish to compare.")
+            break
+        else:
+            print("Error. Please enter your name.")
 
 # Function to get user input for player names and season year
     """
@@ -83,13 +85,23 @@ def welcome_user():
     Returns:
     tuple: Player1's name, Player2's name, and the season year.
     """
-
 def player_selection():
-    
-    player1_name = input("Enter the first player's name: ")
-    player1_name = ' '.join([name.capitalize() for name in player1_name.lower().split()])
-    player2_name = input("Enter the second player's name: ")
-    player2_name = ' '.join([name.capitalize() for name in player2_name.lower().split()])
+    while True:
+        player1_name = input("Enter the first player's name: ").strip()
+        if player1_name and ' ' in player1_name:
+            player1_name = ' '.join([name.capitalize() for name in player1_name.lower().split()])
+            break
+        else:
+            print("Error. Please enter the first player's first and last name.")
+
+    while True:
+        player2_name = input("Enter the second player's name: ").strip()
+        if player2_name and ' ' in player2_name:
+            player2_name = ' '.join([name.capitalize() for name in player2_name.lower().split()])
+            break
+        else:
+            print("Error. Please enter the second player's first and last name.")
+
     season = int(input("Enter the season (year): "))
     return player1_name, player2_name, season
 
@@ -106,6 +118,17 @@ def compare_more_players():
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")
 
+
+def compare_points(player1_data, player2_data):
+    player1_points = player1_data["PTS"]
+    player2_points = player2_data["PTS"]
+
+    if player1_points > player2_points:
+        print(f"\n{player1_name} had more points in the season with {player1_points} points.")
+    elif player1_points < player2_points:
+        print(f"\n{player2_name} had more points in the season with {player2_points} points.")
+    else:
+        print(f"\n{player1_name} and {player2_name} had the same number of points in the season with {player1_points} points each.")
 
 # Main function to run the script
 if __name__ == "__main__":
@@ -126,9 +149,9 @@ if __name__ == "__main__":
             for key, value in player2_data.items():
                 print(f"{key}: {value}")
 
+            compare_points(player1_data, player2_data)
+
             if not compare_more_players():
                 break
         else:
             print("One or both players do not have data for the specified season. Please try again.")
-    
-    
