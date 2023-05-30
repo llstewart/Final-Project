@@ -1,0 +1,4 @@
+SELECT FrameFab_RobotStates.ID,
+  FrameFab_RobotStates.StateDescription,
+  FrameFab_RobotStates.workcenter_number
+FROM FrameFab_RobotStates
