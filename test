@@ -22,4 +22,6 @@ if len(results) > 0:
     event.source.parent.getComponent('TextBox1').text = row['StateDescription']
     event.source.parent.getComponent('TextBox2').text = str(row['BeginTime'])
 
-Error running action 'component.onActionPerformed' on SupervisorDashboard@D/root/Button_3: Traceback (most recent call last): File "<function:runAction>", line 9, in runAction at com.inductiveautomation.ignition.common.db.namedquery.SecuredNamedQueryManager.execute(SecuredNamedQueryManager.java:75) at com.inductiveautomation.ignition.gateway.script.GatewayDBUtilities.runNamedQuery(GatewayDBUtilities.java:418) at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source) at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) at java.base/java.lang.reflect.Method.invoke(Unknown Source) java.lang.Exception: java.lang.Exception: Query path 'supervisor_dashboard' not found in project 'OEE_Tracking'. 
+
+
+Error running action 'component.onActionPerformed' on SupervisorDashboard@D/root/Button_3: Traceback (most recent call last): File "<function:runAction>", line 12, in runAction TypeError: object of type 'com.inductiveautomation.ignition.gateway.datasource.BasicStreamingDataset' has no len() 
