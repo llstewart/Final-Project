@@ -3,3 +3,21 @@ SELECT TOP 6 FrameFab_RobotStates.ID,
   FrameFab_RobotStates.BeginTime,
   FrameFab_RobotStates.workcenter_number
 FROM FrameFab_RobotStates 
+
+# Assume your named query is named 'MyQuery', replace it with your actual query name
+queryName = "MyQuery"
+
+# Assume workcenter_number is a parameter, replace it with your actual workcenter number
+params = {"workcenter_number": 1}
+
+# Run the named query
+results = system.db.runNamedQuery(queryName, params)
+
+# If results are available
+if len(results) > 0:
+    # Get the first row
+    row = results[0]
+
+    # Update the text boxes
+    event.source.parent.getComponent('TextBox1').text = row['StateDescription']
+    event.source.parent.getComponent('TextBox2').text = str(row['BeginTime'])
