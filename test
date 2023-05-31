@@ -1,4 +1,5 @@
-SELECT FrameFab_RobotStates.ID,
+SELECT TOP 6 FrameFab_RobotStates.ID,
   FrameFab_RobotStates.StateDescription,
+  FrameFab_RobotStates.BeginTime,
   FrameFab_RobotStates.workcenter_number
-FROM FrameFab_RobotStates
+FROM FrameFab_RobotStates 
