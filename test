@@ -1,23 +1,17 @@
-here is my query in supervisor_dashboard . it has a parameter called ID and its type is a value and data type is INT2
-SELECT TOP 6 FrameFab_RobotStates.ID,
-  FrameFab_RobotStates.StateDescription,
-  FrameFab_RobotStates.BeginTime,
-  FrameFab_RobotStates.EndTime,
-  FrameFab_RobotStates.workcenter_number
-FROM FrameFab_RobotStates 
-WHERE FrameFab_RobotStates.ID = :ID
 
+
+#updated sql for supervisor_dash
 SELECT TOP 6 
   FrameFab_RobotStates.ID,
   FrameFab_RobotStates.StateDescription,
-  TIMESTAMPDIFF(MINUTE, FrameFab_RobotStates.BeginTime, FrameFab_RobotStates.EndTime) AS TimeDifference,
+  DATEDIFF(MINUTE, FrameFab_RobotStates.BeginTime, FrameFab_RobotStates.EndTime) AS TimeDifference,
   FrameFab_RobotStates.workcenter_number
 FROM FrameFab_RobotStates 
 WHERE FrameFab_RobotStates.ID = :ID
 
 
 
-
+#updated script for python
 
 try:
     #  named query 
