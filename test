@@ -23,3 +23,34 @@
 	
   
   "2023-04-21 15:01:40"
+
+try:
+    #  named query 
+    queryName = "supervisor_dashboard"
+
+    # ID is a parameter, 
+    params = {"ID": 2164}
+
+    # Run the named query
+    results = system.db.runNamedQuery(queryName, params)
+
+    # If results are available
+    if results.rowCount > 0:
+        print('stop error')
+
+        from java.text import SimpleDateFormat
+        format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+        # Convert strings to datetime objects
+        begin_time = format.parse(results.getValueAt(0, 'BeginTime'))
+        end_time = format.parse(results.getValueAt(0, 'EndTime'))
+
+        # Calculate difference in minutes
+        diff_minutes = (end_time.getTime() - begin_time.getTime()) / 1000 / 60
+
+        # Update the text boxes
+        self.getSibling('TextField1.0').props.text = results.getValueAt(0,'StateDescription')
+        self.getSibling('TextField_5').props.text = str(diff_minutes)
+
+except Exception as e:
+    system.perspective.print(e)
