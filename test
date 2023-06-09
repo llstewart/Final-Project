@@ -1,4 +1,25 @@
+	try:
+		#  named query 
+		queryName = "supervisor_dashboard"
+	
+		# ID is a parameter, 
+		params = {"ID": 2164}
+	
+		# Run the named query
+		results = system.db.runNamedQuery(queryName, params)
+	
+		# If results are available
+		if results.rowCount > 0:
+			print('stop error')
 
-SELECT TOP 6 FrameFab_RobotStates.ID,
-  FrameFab_RobotStates.StateDescription
-FROM FrameFab_RobotStates 
+	
+	    	# Update the text boxes
+	        self.getSibling('TextField1.0').props.text = results.getValueAt(0,'StateDescription')
+	        self.getSibling('TextField_5').props.text = results.getValueAt(0, 'BeginTime')
+	    
+	   
+	except Exception as e:
+		system.perspective.print(e)
+	
+  
+  "2023-04-21 15:01:40"
