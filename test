@@ -6,3 +6,36 @@ SELECT TOP 6 FrameFab_RobotStates.ID,
   FrameFab_RobotStates.workcenter_number
 FROM FrameFab_RobotStates 
 WHERE FrameFab_RobotStates.ID = :ID
+
+SELECT TOP 6 
+  FrameFab_RobotStates.ID,
+  FrameFab_RobotStates.StateDescription,
+  TIMESTAMPDIFF(MINUTE, FrameFab_RobotStates.BeginTime, FrameFab_RobotStates.EndTime) AS TimeDifference,
+  FrameFab_RobotStates.workcenter_number
+FROM FrameFab_RobotStates 
+WHERE FrameFab_RobotStates.ID = :ID
+
+
+
+
+
+try:
+    #  named query 
+    queryName = "supervisor_dashboard"
+
+    # ID is a parameter, 
+    params = {"ID": 2164}
+
+    # Run the named query
+    results = system.db.runNamedQuery(queryName, params)
+
+    # If results are available
+    if results.rowCount > 0:
+        print('stop error')
+
+        # Update the text boxes
+        self.getSibling('TextField1.0').props.text = results.getValueAt(0,'StateDescription')
+        self.getSibling('TextField_5').props.text = str(results.getValueAt(0, 'TimeDifference')) + " minutes"
+
+except Exception as e:
+    system.perspective.print(e)
