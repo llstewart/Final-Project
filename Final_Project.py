@@ -65,9 +65,9 @@ class NBAPlayerData:
         if player_id:
             return self.get_season_averages(player_id, season)
         else:
-            return None
+                 return None
 
-#Function that prints user's name and welcome messgae with short program explanation
+#Function that prints user's name and welcome messgae with short program explanation\
 
 def welcome_user():
     while True:
