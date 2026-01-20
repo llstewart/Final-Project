@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Player Comparison</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --court-orange: #f26522;
+            --court-brown: #8b4513;
+            --court-floor: #c19a6b;
+            --court-lines: #ffffff;
+            --winner-gold: #ffd700;
+            --dark-bg: #1a1a2e;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --player1-color: #552583;
+            --player2-color: #006bb6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .court-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('basketball-court.svg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: linear-gradient(135deg, rgba(242, 101, 34, 0.2), rgba(26, 26, 46, 0.8));
+        }
+
+        .header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            letter-spacing: 3px;
+            color: var(--court-orange);
+            text-shadow: 0 4px 20px rgba(242, 101, 34, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+
+        .input-section {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .player-input, .season-input {
+            position: relative;
+        }
+
+        .player-input input, .season-input input {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 1.1rem;
+            border: 3px solid rgba(242, 101, 34, 0.5);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .player-input input:focus, .season-input input:focus {
+            outline: none;
+            border-color: var(--court-orange);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 30px rgba(242, 101, 34, 0.4);
+        }
+
+        .player-input input::placeholder, .season-input input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.98);
+            border: 2px solid var(--court-orange);
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .suggestions.show {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            color: white;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(242, 101, 34, 0.3);
+        }
+
+        .season-input {
+            grid-column: 1 / -1;
+        }
+
+        .compare-button {
+            grid-column: 1 / -1;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--court-orange) 0%, #d85a1a 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 30px rgba(242, 101, 34, 0.4);
+        }
+
+        .compare-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(242, 101, 34, 0.6);
+        }
+
+        .compare-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .basketball-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background:
+                linear-gradient(45deg, var(--court-orange) 25%, transparent 25%, transparent 75%, var(--court-orange) 75%),
+                linear-gradient(45deg, var(--court-orange) 25%, #1a1a2e 25%, #1a1a2e 75%, var(--court-orange) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading p {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--court-orange);
+        }
+
+        .error {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px 30px;
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid rgba(220, 53, 69, 0.6);
+            border-radius: 15px;
+            color: #ff6b6b;
+            text-align: center;
+            font-size: 1.1rem;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .results {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 40px;
+            align-items: start;
+            display: none;
+        }
+
+        .results.show {
+            display: grid;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .player1-card {
+            border-left: 8px solid var(--player1-color);
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .player2-card {
+            border-left: 8px solid var(--player2-color);
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .player-card h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: var(--dark-bg);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .player-card .team-info {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.05), rgba(26, 26, 46, 0.1));
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .stat-item:hover {
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.1), rgba(26, 26, 46, 0.15));
+            transform: translateX(5px);
+        }
+
+        .stat-item.winner {
+            background: linear-gradient(135deg, var(--winner-gold), #ffed4e);
+            border-color: #ffd700;
+            animation: pulseGold 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGold {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 20px 5px rgba(255, 215, 0, 0);
+            }
+        }
+
+        .stat-label {
+            font-weight: bold;
+            color: var(--dark-bg);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--dark-bg);
+        }
+
+        .stat-item.winner .stat-label,
+        .stat-item.winner .stat-value {
+            color: #8b6f00;
+        }
+
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .vs-divider span {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            color: var(--court-orange);
+            background: rgba(242, 101, 34, 0.2);
+            padding: 20px 30px;
+            border-radius: 50%;
+            border: 4px solid var(--court-orange);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .summary {
+            max-width: 1000px;
+            margin: 40px auto 60px;
+            padding: 0 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .summary.show {
+            display: block;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .summary h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: var(--court-orange);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .leader-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .leader-badge {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 237, 78, 0.1));
+            border: 3px solid var(--winner-gold);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .leader-badge .category {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .leader-badge .leader-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: var(--winner-gold);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .vs-divider {
+                padding: 0;
+            }
+
+            .vs-divider span {
+                font-size: 2rem;
+                padding: 15px 25px;
+            }
+
+            .player-card h2 {
+                font-size: 2rem;
+            }
+
+            .leader-badges {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="court-background"></div>
+
+    <header class="header">
+        <h1>NBA PLAYER COMPARISON</h1>
+        <p>Compare season averages of your favorite NBA players</p>
+    </header>
+
+    <section class="input-section">
+        <div class="player-input">
+            <input type="text" id="player1" placeholder="Enter Player 1 (e.g., Lebron James)" autocomplete="off">
+            <div id="suggestions1" class="suggestions"></div>
+        </div>
+        <div class="player-input">
+            <input type="text" id="player2" placeholder="Enter Player 2 (e.g., Stephen Curry)" autocomplete="off">
+            <div id="suggestions2" class="suggestions"></div>
+        </div>
+        <div class="season-input">
+            <input type="number" id="season" placeholder="Enter Season Year (e.g., 2020)" min="1946" max="2025">
+        </div>
+        <button id="compare-btn" class="compare-button">Compare Players</button>
+    </section>
+
+    <div id="loading" class="loading">
+        <div class="basketball-spinner"></div>
+        <p>Fetching player data...</p>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <section id="results" class="results">
+        <div class="player-card player1-card">
+            <h2 id="player1-name"></h2>
+            <div class="team-info" id="player1-team"></div>
+            <div class="stats-grid" id="player1-stats"></div>
+        </div>
+
+        <div class="vs-divider">
+            <span>VS</span>
+        </div>
+
+        <div class="player-card player2-card">
+            <h2 id="player2-name"></h2>
+            <div class="team-info" id="player2-team"></div>
+            <div class="stats-grid" id="player2-stats"></div>
+        </div>
+    </section>
+
+    <section id="summary" class="summary">
+        <h3>Season Leaders</h3>
+        <div class="leader-badges" id="leader-badges"></div>
+    </section>
+
+    <script>
+        // State management
+        const state = {
+            player1Data: null,
+            player2Data: null,
+            comparison: null,
+            isLoading: false
+        };
+
+        // DOM elements
+        const player1Input = document.getElementById('player1');
+        const player2Input = document.getElementById('player2');
+        const seasonInput = document.getElementById('season');
+        const compareBtn = document.getElementById('compare-btn');
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const resultsEl = document.getElementById('results');
+        const summaryEl = document.getElementById('summary');
+        const suggestions1 = document.getElementById('suggestions1');
+        const suggestions2 = document.getElementById('suggestions2');
+
+        // Debounce function for autocomplete
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Search for players (autocomplete)
+        async function searchPlayers(query, suggestionsEl) {
+            if (query.length < 2) {
+                suggestionsEl.classList.remove('show');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+                const players = await response.json();
+
+                if (players.length > 0) {
+                    suggestionsEl.innerHTML = players.map(player =>
+                        `<div class="suggestion-item">${player}</div>`
+                    ).join('');
+                    suggestionsEl.classList.add('show');
+
+                    // Add click handlers
+                    suggestionsEl.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const inputEl = suggestionsEl.previousElementSibling;
+                            inputEl.value = item.textContent;
+                            suggestionsEl.classList.remove('show');
+                        });
+                    });
+                } else {
+                    suggestionsEl.classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Error searching players:', error);
+            }
+        }
+
+        // Debounced search handlers
+        const debouncedSearch1 = debounce((query) => searchPlayers(query, suggestions1), 300);
+        const debouncedSearch2 = debounce((query) => searchPlayers(query, suggestions2), 300);
+
+        // Input event listeners
+        player1Input.addEventListener('input', (e) => debouncedSearch1(e.target.value));
+        player2Input.addEventListener('input', (e) => debouncedSearch2(e.target.value));
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.player-input')) {
+                suggestions1.classList.remove('show');
+                suggestions2.classList.remove('show');
+            }
+        });
+
+        // Compare players
+        async function comparePlayers() {
+            const player1 = player1Input.value.trim();
+            const player2 = player2Input.value.trim();
+            const season = seasonInput.value.trim();
+
+            // Validation
+            if (!player1 || !player2) {
+                showError('Please enter both player names');
+                return;
+            }
+
+            if (!season) {
+                showError('Please enter a season year');
+                return;
+            }
+
+            // Hide previous results and errors
+            hideError();
+            hideResults();
+            showLoading();
+
+            try {
+                const response = await fetch('/api/compare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        player1,
+                        player2,
+                        season: parseInt(season)
+                    })
+                });
+
+                const data = await response.json();
+
+                hideLoading();
+
+                if (!data.success) {
+                    showError(data.error);
+                    return;
+                }
+
+                // Update state
+                state.player1Data = data.player1;
+                state.player2Data = data.player2;
+                state.comparison = data.comparison;
+
+                // Render results
+                renderResults();
+
+            } catch (error) {
+                hideLoading();
+                showError('Failed to fetch data. Please try again.');
+                console.error('Error:', error);
+            }
+        }
+
+        // Render results
+        function renderResults() {
+            // Render player 1
+            document.getElementById('player1-name').textContent = state.player1Data.name;
+            document.getElementById('player1-team').textContent =
+                `${state.player1Data.stats.TEAM_ABBREVIATION || 'N/A'} • Age ${state.player1Data.stats.PLAYER_AGE || 'N/A'}`;
+
+            renderStats(state.player1Data, 'player1-stats');
+
+            // Render player 2
+            document.getElementById('player2-name').textContent = state.player2Data.name;
+            document.getElementById('player2-team').textContent =
+                `${state.player2Data.stats.TEAM_ABBREVIATION || 'N/A'} • Age ${state.player2Data.stats.PLAYER_AGE || 'N/A'}`;
+
+            renderStats(state.player2Data, 'player2-stats');
+
+            // Show results
+            resultsEl.classList.add('show');
+
+            // Render summary
+            renderSummary();
+        }
+
+        // Define stat categories to display
+        const STAT_CATEGORIES = [
+            { key: 'PTS', label: 'Points', format: (v) => v.toFixed(1) },
+            { key: 'REB', label: 'Rebounds', format: (v) => v.toFixed(1) },
+            { key: 'AST', label: 'Assists', format: (v) => v.toFixed(1) },
+            { key: 'FG_PCT', label: 'FG%', format: (v) => (v * 100).toFixed(1) + '%' },
+            { key: 'FG3_PCT', label: '3P%', format: (v) => (v * 100).toFixed(1) + '%' },
+            { key: 'FT_PCT', label: 'FT%', format: (v) => (v * 100).toFixed(1) + '%' },
+            { key: 'STL', label: 'Steals', format: (v) => v.toFixed(1) },
+            { key: 'BLK', label: 'Blocks', format: (v) => v.toFixed(1) },
+            { key: 'MIN', label: 'Minutes', format: (v) => v.toFixed(1) }
+        ];
+
+        // Render stats for a player
+        function renderStats(playerData, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            STAT_CATEGORIES.forEach((stat, index) => {
+                const value = playerData.stats[stat.key];
+                if (value === null || value === undefined) return;
+
+                const statItem = document.createElement('div');
+                statItem.className = 'stat-item';
+
+                // Check if this player is the winner for this stat
+                const otherPlayer = containerId === 'player1-stats' ? state.player2Data : state.player1Data;
+                const otherValue = otherPlayer.stats[stat.key];
+
+                if (otherValue !== null && otherValue !== undefined && value > otherValue) {
+                    statItem.classList.add('winner');
+                }
+
+                statItem.innerHTML = `
+                    <span class="stat-label">${stat.label}</span>
+                    <span class="stat-value">${stat.format(value)}</span>
+                `;
+
+                // Stagger animation
+                setTimeout(() => {
+                    statItem.style.animation = 'fadeInUp 0.4s ease-out';
+                    container.appendChild(statItem);
+
+                    // Animate counter
+                    animateCounter(statItem.querySelector('.stat-value'), 0, value, stat.format, 800);
+                }, index * 50);
+            });
+        }
+
+        // Animate counter
+        function animateCounter(element, start, end, formatter, duration) {
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                const current = start + (end - start) * easeOutQuad(progress);
+                element.textContent = formatter(current);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Easing function
+        function easeOutQuad(t) {
+            return t * (2 - t);
+        }
+
+        // Render summary
+        function renderSummary() {
+            const badges = document.getElementById('leader-badges');
+            badges.innerHTML = '';
+
+            const leaders = [
+                { category: 'Points', leader: state.comparison.points_leader },
+                { category: 'Rebounds', leader: state.comparison.rebounds_leader },
+                { category: 'Assists', leader: state.comparison.assists_leader },
+                { category: 'Field Goal %', leader: state.comparison.fg_pct_leader }
+            ];
+
+            leaders.forEach((item, index) => {
+                setTimeout(() => {
+                    const badge = document.createElement('div');
+                    badge.className = 'leader-badge';
+                    badge.innerHTML = `
+                        <div class="category">${item.category} Leader</div>
+                        <div class="leader-name">${item.leader}</div>
+                    `;
+                    badge.style.animation = 'fadeInUp 0.5s ease-out';
+                    badges.appendChild(badge);
+                }, index * 100);
+            });
+
+            summaryEl.classList.add('show');
+        }
+
+        // UI helper functions
+        function showLoading() {
+            loadingEl.classList.add('show');
+        }
+
+        function hideLoading() {
+            loadingEl.classList.remove('show');
+        }
+
+        function showError(message) {
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideError() {
+            errorEl.classList.remove('show');
+        }
+
+        function hideResults() {
+            resultsEl.classList.remove('show');
+            summaryEl.classList.remove('show');
+        }
+
+        // Event listeners
+        compareBtn.addEventListener('click', comparePlayers);
+
+        // Allow Enter key to trigger comparison
+        [player1Input, player2Input, seasonInput].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    comparePlayers();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
